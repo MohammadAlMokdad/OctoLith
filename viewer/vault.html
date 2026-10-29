@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OCTOLITH vault viewer</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #1a120c; overflow: hidden; }
+      canvas { display: block; }
+      #ui {
+        position: fixed; top: 16px; left: 16px; padding: 12px 14px;
+        font: 12px/1.6 ui-monospace, 'IBM Plex Mono', monospace; color: #fff;
+        background: rgba(40, 28, 18, 0.55); border-radius: 6px; backdrop-filter: blur(6px);
+      }
+      #ui label { display: block; }
+      #ui input[type='range'] { width: 160px; vertical-align: middle; }
+      body.shot #ui { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="ui">
+      <strong>// OCTOLITH · Scene 2 relic vault</strong>
+      <label>frost <input id="frost" type="range" min="0" max="1" step="0.01" value="1" /></label>
+      <label>view
+        <select id="view">
+          <option value="all">all three</option>
+          <option value="1">01 tutankhamun mask</option>
+          <option value="2">02 cat of bastet</option>
+          <option value="3">03 ankh</option>
+        </select>
+      </label>
+      <label><input id="bare" type="checkbox" /> hide glass</label>
+    </div>
+    <script type="module" src="./vault.js"></script>
+  </body>
+</html>

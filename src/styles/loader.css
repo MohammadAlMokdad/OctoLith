@@ -1,0 +1,31 @@
+/* Phase A: a tiny monospace bar of "-", "=", "+" centred on the flat background. */
+.loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.loader__bar {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 17px;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  white-space: pre;
+  color: #fff6e6;
+  text-shadow:
+    0 0 6px color-mix(in srgb, var(--line) 85%, transparent),
+    0 0 20px color-mix(in srgb, var(--line) 45%, transparent);
+  transform-origin: 50% 50%;
+  transition:
+    transform 200ms cubic-bezier(0.6, 0, 0.8, 0.2),
+    opacity 200ms linear;
+}
+
+.loader.is-done .loader__bar {
+  transform: scaleX(0);
+  opacity: 0;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "octolith",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --host --port 5199 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview",
+    "viewer": "vite --open /viewer/",
+    "blender": "node tools/blender.mjs",
+    "deploy": "npm run build && npx --yes vercel@latest deploy --prod"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "lil-gui": "^0.21.0",
+    "postprocessing": "^6.39.5",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "vite": "^8.3.1"
+  }
+}

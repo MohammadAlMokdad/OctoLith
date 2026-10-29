@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+
+# Build output and caches
+dist/
+dist-ssr/
+.vite/
+.cache/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files (keep only the template)
+.env
+.env.*
+!.env.example
+
+# Vercel CLI project link
+.vercel/
+
+# Editors and OS files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# AI assistant folders and local notes
+.claude/
+CLAUDE.local.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Blender authoring files: master scenes, numbered backups, preview renders and
+# intermediate textures. The scripts in blender/scripts rebuild them; the site
+# only loads what they export into public/assets/.
+*.blend
+*.blend[0-9]
+*.blend[0-9][0-9]
+blender/previews/
+blender/textures/
+
+# Raw pipeline inputs (third-party downloads, scans, full-length audio).
+# Not needed at runtime; see source-assets/README.md for what goes here.
+source-assets/*
+!source-assets/README.md
+
+# Design source files and archives
+*.psd
+*.psb
+*.ai
+*.xcf
+*.kra
+*.zip
+*.7z
+*.rar

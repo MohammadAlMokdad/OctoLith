@@ -1,0 +1,5 @@
+# Only the built site goes up to Vercel (npm run deploy builds dist/ first and
+# vercel.json serves it as is): the sources, raw assets and Blender files stay here.
+/*
+!/dist
+!/vercel.json

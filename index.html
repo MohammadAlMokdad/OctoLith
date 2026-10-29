@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- viewport-fit=cover: the scene runs under a phone's notch and home bar; the UI keeps
+         clear of them (env(safe-area-inset-*) in base.css). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- A phone browser's toolbar colour (StormTransition darkens it with section 2). -->
+    <meta name="theme-color" content="#E6C9A8" />
+    <title>OCTOLITH</title>
+    <meta name="description" content="OCTOLITH carves digital monuments: immersive 3D and motion for brands built to last. Descend from a desert pyramid into a vault of ancient relics." />
+    <!-- Link previews. og:url and og:image are absolute: the live address on Vercel
+         (deployed 2026-10-02). If the site moves to its own domain, change both. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="OCTOLITH" />
+    <meta property="og:title" content="OCTOLITH" />
+    <meta property="og:description" content="Digital monuments in 3D and motion. Descend from a desert pyramid into a vault of ancient relics." />
+    <meta property="og:url" content="https://octolith.vercel.app/" />
+    <meta property="og:image" content="https://octolith.vercel.app/assets/hero_fallback.jpg" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1080" />
+    <meta property="og:image:alt" content="A stepped sandstone pyramid with glowing gold seams in the desert" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/brand/octopus-mark.svg" type="image/svg+xml" />
+    <!-- Linked here (not imported from main.js) so they block the first paint:
+         no flash of the unstyled page while the JS loads. -->
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/loader.css" />
+    <link rel="stylesheet" href="/src/styles/ui.css" />
+    <!-- No browser zoom and no developer-tools shortcuts / right-click menu
+         (src/ui/lockdown.js); separate from main.js so it is on from the start. -->
+    <script type="module" src="/src/ui/lockdown.js"></script>
+    <!-- IBM Plex Mono Medium, self-hosted (public/fonts; @font-face in base.css). The
+         latin subset is preloaded so its download starts with the page, not after the CSS. -->
+    <link rel="preload" href="/fonts/ibm-plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="is-loading is-intro">
+    <!-- Phase A: ASCII loader (pure HTML/CSS, no WebGL). -->
+    <div class="loader" id="loader" aria-hidden="true">
+      <span class="loader__bar" id="loader-bar">------------</span>
+    </div>
+
+    <!-- WebGL stage. Decorative: the real content is in the DOM below. -->
+    <div class="stage" id="stage" aria-hidden="true"></div>
+    <!-- Shown instead of the stage when WebGL is unavailable. -->
+    <img class="stage-fallback" id="stage-fallback" alt="" hidden src="/assets/hero_fallback.jpg" />
+
+    <!-- Short fade used by skip / reduced motion. -->
+    <div class="veil" id="veil" aria-hidden="true"></div>
+
+    <!--
+      Editable copy: change the text inside the [data-scramble] elements.
+      Each one types itself in during the intro, igloo-style (src/ui), and the
+      logo, the sound toggle and the links replay their animation on hover.
+    -->
+    <main class="hero" id="hero">
+      <h1 class="sr-only">OCTOLITH</h1>
+
+      <header class="corner corner--tl">
+        <a class="logo" href="/" aria-label="OCTOLITH home" data-ui>
+          <!-- OCTOLITH in Papyrus, traced to outlines (brand/octolith-wordmark.svg) -->
+          <img class="logo__word" src="/brand/octolith-wordmark.svg" alt="" width="853" height="121" />
+        </a>
+        <p class="ui-text copyright" data-ui>
+          <span class="ui-title" data-scramble data-copyright>// Copyright © 2026</span>
+          <span class="copyright__rights" data-rights><span data-scramble>OCTOLITH</span><br /><span data-scramble>All Rights Reserved.</span></span>
+        </p>
+      </header>
+
+      <aside class="corner corner--tr manifesto" data-ui>
+        <p class="ui-text">
+          <span class="ui-title manifesto__title" data-scramble>////// Manifesto</span>
+          <span class="manifesto__text" data-scramble>OCTOLITH carves digital monuments: immersive 3D and motion for brands built to outlast the scroll.</span>
+        </p>
+      </aside>
+
+      <footer class="corner corner--bl" data-ui>
+        <p class="ui-text scroll-hint"><span data-scramble>Scroll down to discover.</span></p>
+        <!-- Right-click the toggle (long-press on touch screens, the menu key from the
+             keyboard) for the volumes; the tip beside it says so for a few seconds once
+             the toggle has come in. data-touch: its wording on touch screens.
+             src/ui/SoundMixer.js. -->
+        <div class="sound-row">
+          <button class="ui-text sound" id="sound-toggle" type="button" aria-pressed="false" aria-controls="sound-mixer">
+            <svg class="sound__icon" viewBox="0 0 22 22" aria-hidden="true">
+              <path class="sound__speaker" d="M2.5 8h3.2L10.5 4v14l-4.8-4H2.5z" />
+              <path class="sound__off" d="M14 8.5l5 5M19 8.5l-5 5" />
+              <path class="sound__on" d="M14 7.5c1.6 1.9 1.6 5.1 0 7M16.6 5.2c2.9 3.3 2.9 8.3 0 11.6" />
+            </svg>
+            <span data-scramble>Sound:</span>
+            <span data-scramble id="sound-state">Off</span>
+          </button>
+          <p class="ui-text sound-hint" id="sound-hint" aria-hidden="true"><span class="sound-hint__mark">//</span> <span data-hint data-touch="Long-press for volume">Right-click for volume</span></p>
+          <div class="sound-mixer" id="sound-mixer" role="group" aria-label="Volume" hidden>
+            <span class="sound-mixer__frame" aria-hidden="true"></span>
+            <p class="ui-text sound-mixer__title" aria-hidden="true"><span data-mix-text>/// Volume</span></p>
+            <label class="ui-text sound-mixer__row">
+              <span data-mix-text>FX</span>
+              <input class="sound-mixer__slider" type="range" min="0" max="100" step="1" value="100" data-volume="fx" aria-label="Effects volume" />
+              <output class="sound-mixer__value" aria-hidden="true">100</output>
+            </label>
+            <label class="ui-text sound-mixer__row">
+              <span data-mix-text>Music</span>
+              <input class="sound-mixer__slider" type="range" min="0" max="100" step="1" value="100" data-volume="music" aria-label="Music volume" />
+              <output class="sound-mixer__value" aria-hidden="true">100</output>
+            </label>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!--
+      Section 2, the relic vault: one label set per crystal (same order as
+      INTRO_CONFIG.vault.relics). The dates are real (the day the mask was
+      first seen; the eras of the cat and the ankh); edit the text freely. The
+      [data-scramble] parts scramble in when their crystal centres. TEMP
+      numbers are filled in live. Positioned around the crystal by
+      src/vault/VaultHud.js.
+    -->
+    <section class="vault-hud" id="vault-hud" aria-label="Relics">
+      <svg class="vault-hud__lines" aria-hidden="true"></svg>
+      <article class="relic" data-relic="0">
+        <h2 class="relic__title ui-text"><span data-scramble>RELIC_01</span><br /><span data-scramble>TUTANKHAMUN</span></h2>
+        <p class="relic__temp ui-text" aria-hidden="true">TEMP <span data-temp>47.12</span><br /><span data-delta>+00.31</span></p>
+        <button class="relic__date ui-text" type="button" data-explore="0"><span data-scramble>D 28.10.1925</span><br /><span data-scramble data-touch="TAP TO EXPLORE">CLICK TO EXPLORE</span></button>
+      </article>
+      <article class="relic" data-relic="1">
+        <h2 class="relic__title ui-text"><span data-scramble>RELIC_02</span><br /><span data-scramble>CAT OF BASTET</span></h2>
+        <p class="relic__temp ui-text" aria-hidden="true">TEMP <span data-temp>44.80</span><br /><span data-delta>-00.12</span></p>
+        <button class="relic__date ui-text" type="button" data-explore="1"><span data-scramble>D 664-332 BC</span><br /><span data-scramble data-touch="TAP TO EXPLORE">CLICK TO EXPLORE</span></button>
+      </article>
+      <article class="relic" data-relic="2">
+        <h2 class="relic__title ui-text"><span data-scramble>RELIC_03</span><br /><span data-scramble>ANKH</span></h2>
+        <p class="relic__temp ui-text" aria-hidden="true">TEMP <span data-temp>49.03</span><br /><span data-delta>+00.07</span></p>
+        <button class="relic__date ui-text" type="button" data-explore="2"><span data-scramble>D C. 3000 BC</span><br /><span data-scramble data-touch="TAP TO EXPLORE">CLICK TO EXPLORE</span></button>
+      </article>
+    </section>
+
+    <!--
+      Section 4, the room at the bottom of the rings (igloo's footer): its
+      particle sculpture takes the shape of the current link. Edit the titles
+      and urls freely; data-shape picks the sculpture's shape (octopus,
+      instagram, whatsapp, email: src/room/volumes.js) and data-scale its size.
+      A click on either half of the screen, the arrow keys or a swipe changes
+      the link; the box opens it (src/room/RoomLinks.js).
+    -->
+    <nav class="room-links" id="room-links" aria-label="Contact">
+      <span class="room-links__frame" aria-hidden="true"></span>
+      <ul class="room-links__list">
+        <li><a class="room-links__link ui-text" data-link data-shape="octopus" data-scale="1.25" href="https://octopus.eu.com" target="_blank" rel="noopener"><span data-scramble>Website</span></a></li>
+        <li><a class="room-links__link ui-text" data-link data-shape="instagram" data-scale="1.25" href="https://www.instagram.com/octopus.media.eu" target="_blank" rel="noopener"><span data-scramble>Instagram</span></a></li>
+        <li><a class="room-links__link ui-text" data-link data-shape="whatsapp" data-scale="1.25" href="https://wa.me/9613601590" target="_blank" rel="noopener" title="+961 3 601 590"><span data-scramble>WhatsApp</span></a></li>
+        <li><a class="room-links__link ui-text" data-link data-shape="email" data-scale="1.25" href="mailto:media@octopus.eu.com" title="media@octopus.eu.com"><span data-scramble>Email</span></a></li>
+      </ul>
+    </nav>
+
+    <!--
+      Click to explore: one page per relic (same order). The summaries are
+      historical facts about each object; /// Discover and /// Visit are the
+      studio's contacts (never href="#": it scrolls the page back to the hero
+      behind the open page). /// Model credits each 3D model
+      (CC BY 4.0 requires it: keep these lines). Each [data-line] types in when
+      the page opens (src/vault/VaultDetail.js).
+    -->
+    <section class="relic-page" id="relic-page" role="dialog" aria-modal="true" aria-label="Relic" aria-hidden="true" hidden>
+      <button class="relic-page__close ui-text" type="button" data-close><span class="relic-page__frame" aria-hidden="true"></span><span data-scramble>Close</span></button>
+      <div class="relic-page__panel">
+        <article class="relic-page__item" data-relic="0">
+          <h2 class="relic-page__head ui-text"><span data-line>////// Summary</span></h2>
+          <p class="ui-text"><span data-line>The gold funerary mask of Tutankhamun, the boy king of Egypt's 18th Dynasty. He came to the throne at about nine and died at about nineteen, around 1323 BC. The mask covered the head and shoulders of his mummy, inside the innermost of three nested coffins, the last one solid gold.</span></p>
+          <p class="ui-text"><span data-line>Howard Carter found the tomb, KV62 in the Valley of the Kings, in November 1922, and first saw the mask on 28 October 1925, when the third coffin was opened. It is 54 cm tall and weighs about 10 kg: beaten gold inlaid with lapis lazuli, carnelian, quartz, obsidian, turquoise and coloured glass. The vulture and the cobra on the brow stand for Upper and Lower Egypt, and a spell from the Book of the Dead runs across the shoulders and the back.</span></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Discover</span></h3>
+          <p class="relic-page__links ui-text"><a href="https://wa.me/9613601590" target="_blank" rel="noopener" title="+961 3 601 590"><span data-line>[WhatsApp]</span> <span aria-hidden="true">&#8599;</span></a> <a href="https://www.instagram.com/octopus.media.eu" target="_blank" rel="noopener"><span data-line>[IG]</span> <span aria-hidden="true">&#8599;</span></a> <a href="mailto:media@octopus.eu.com" title="media@octopus.eu.com"><span data-line>[Email]</span> <span aria-hidden="true">&#8599;</span></a></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Visit</span></h3>
+          <p class="relic-page__links ui-text"><a href="https://octopus.eu.com" target="_blank" rel="noopener"><span data-line>[website]</span> <span aria-hidden="true">&#8599;</span></a></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Model</span></h3>
+          <p class="ui-text"><span data-line>"Tutankhamun mask - Hunyuan" by vmmaniac, CC BY 4.0.</span></p>
+          <p class="relic-page__links ui-text"><a href="https://sketchfab.com/models/f79ba82300cc4b9b9637d94f8959e970" target="_blank" rel="noopener"><span data-line>[sketchfab]</span> <span aria-hidden="true">&#8599;</span></a> <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener"><span data-line>[license]</span> <span aria-hidden="true">&#8599;</span></a></p>
+        </article>
+        <article class="relic-page__item" data-relic="1">
+          <h2 class="relic-page__head ui-text"><span data-line>////// Summary</span></h2>
+          <p class="ui-text"><span data-line>Bronze cats like this one were offerings to Bastet, goddess of the home, of fertility and of protection, first shown as a lioness and later as a cat. Her cult centre was Bubastis in the Nile Delta. Herodotus, writing around 430 BC, describes her festival there and says it drew 700,000 pilgrims.</span></p>
+          <p class="ui-text"><span data-line>Most of these statues date from the Late Period (664-332 BC) and the Ptolemaic era, when cats were mummified by the hundreds of thousands as offerings; some hollow bronzes even held a cat mummy. The best known, the Gayer-Anderson cat in the British Museum (about 600 BC), wears gold rings in its ears and nose. The historian Diodorus Siculus saw a crowd in Egypt kill a Roman who had killed a cat.</span></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Discover</span></h3>
+          <p class="relic-page__links ui-text"><a href="https://wa.me/9613601590" target="_blank" rel="noopener" title="+961 3 601 590"><span data-line>[WhatsApp]</span> <span aria-hidden="true">&#8599;</span></a> <a href="https://www.instagram.com/octopus.media.eu" target="_blank" rel="noopener"><span data-line>[IG]</span> <span aria-hidden="true">&#8599;</span></a> <a href="mailto:media@octopus.eu.com" title="media@octopus.eu.com"><span data-line>[Email]</span> <span aria-hidden="true">&#8599;</span></a></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Visit</span></h3>
+          <p class="relic-page__links ui-text"><a href="https://octopus.eu.com" target="_blank" rel="noopener"><span data-line>[website]</span> <span aria-hidden="true">&#8599;</span></a></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Model</span></h3>
+          <p class="ui-text"><span data-line>"Egyptian Cat Statue" by Ankledot, CC BY 4.0.</span></p>
+          <p class="relic-page__links ui-text"><a href="https://sketchfab.com/models/02b0456362f9442da46d39fb34b3ee5b" target="_blank" rel="noopener"><span data-line>[sketchfab]</span> <span aria-hidden="true">&#8599;</span></a> <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener"><span data-line>[license]</span> <span aria-hidden="true">&#8599;</span></a></p>
+        </article>
+        <article class="relic-page__item" data-relic="2">
+          <h2 class="relic-page__head ui-text"><span data-line>////// Summary</span></h2>
+          <p class="ui-text"><span data-line>The ankh is the hieroglyph for &quot;life&quot;, in use since the Early Dynastic Period, around 3000 BC. In tomb and temple scenes the gods hold it to the king's nose to give him the breath of life, and it appears in royal names: Tutankhamun means &quot;living image of Amun&quot;.</span></p>
+          <p class="ui-text"><span data-line>No one knows for certain what it first showed. The Egyptologist Alan Gardiner suggested a sandal strap; others see a knot of cloth or a mirror, and mirror cases were made in its shape, one of them found in Tutankhamun's tomb. Egypt's early Christians, the Copts, adopted it as the crux ansata, the cross with a handle.</span></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Discover</span></h3>
+          <p class="relic-page__links ui-text"><a href="https://wa.me/9613601590" target="_blank" rel="noopener" title="+961 3 601 590"><span data-line>[WhatsApp]</span> <span aria-hidden="true">&#8599;</span></a> <a href="https://www.instagram.com/octopus.media.eu" target="_blank" rel="noopener"><span data-line>[IG]</span> <span aria-hidden="true">&#8599;</span></a> <a href="mailto:media@octopus.eu.com" title="media@octopus.eu.com"><span data-line>[Email]</span> <span aria-hidden="true">&#8599;</span></a></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Visit</span></h3>
+          <p class="relic-page__links ui-text"><a href="https://octopus.eu.com" target="_blank" rel="noopener"><span data-line>[website]</span> <span aria-hidden="true">&#8599;</span></a></p>
+          <h3 class="relic-page__head ui-text"><span data-line>/// Model</span></h3>
+          <p class="ui-text"><span data-line>"Ankh Asset" by scrampunk, CC BY 4.0.</span></p>
+          <p class="relic-page__links ui-text"><a href="https://sketchfab.com/3d-models/ankh-asset-fbeb7776320b47ff81060097d17d2669" target="_blank" rel="noopener"><span data-line>[sketchfab]</span> <span aria-hidden="true">&#8599;</span></a> <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener"><span data-line>[license]</span> <span aria-hidden="true">&#8599;</span></a></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- The page's scroll height: the whole experience, hero to room and round
+         the loop. src/transition/StormTransition.js sets it to (loop + 1) screens
+         plus the viewport height; zero on the no-WebGL fallback page (base.css). -->
+    <div class="track" id="track" aria-hidden="true"></div>
+
+    <noscript><p class="noscript">OCTOLITH needs JavaScript for its 3D intro.</p></noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

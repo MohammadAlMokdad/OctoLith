@@ -1,0 +1,211 @@
+/* IBM Plex Mono Medium, self-hosted (public/fonts): Google Fonts' latin and
+   latin-ext subsets with their unicode ranges. block, not swap: the UI types
+   itself in (src/ui), so a short blank beats a flash of the fallback font. */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('/fonts/ibm-plex-mono-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Colours come from INTRO_CONFIG at boot (main.js sets these variables). */
+:root {
+  --scan-bg: #a99479;
+  --scan-bg-top: #b8a487;
+  --line: #ffd37e;
+  --ui: #fff8ee;
+  --ui-title: #4a3524;
+  --ui-light: #f1d3a1;
+  --page-title: #7d6a52;
+  --page-text: #bca47e;
+  --section-dark: 0; /* 0 over the hero -> 1 over the dark section 2 (StormTransition) */
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* igloo's UI grid (its config: gridSize / topMargin / logo width) and text
+     sizes (its MSDF text at scale 250, and 230 for the scroll hint and the
+     sound toggle), on large screens. Smaller screens step down like igloo's:
+     below 1600 x 800, then below 640. */
+  --ui-x: 125px;
+  --ui-y: 90px;
+  --ui-size: 17px;
+  --ui-size-s: 15.64px;
+  --logo-w: 200px;
+  --page-size: 18.4px; /* a relic's page (igloo's project text: size 24 / 18) */
+
+  /* The glow (igloo gets it from bloom on its WebGL UI). The logo's flickers
+     with it (src/ui/glitch.js). */
+  --logo-glow: drop-shadow(0 0 1px rgba(255, 250, 240, 0.85)) drop-shadow(0 0 6px rgba(255, 236, 200, 0.6))
+    drop-shadow(0 0 18px rgba(255, 214, 150, 0.35));
+  --text-glow: 0 0 1px rgba(255, 250, 240, 0.5), 0 0 5px rgba(255, 232, 196, 0.4);
+
+  /* The UI's distances from each edge: the grid plus whatever a phone's
+     notch, rounded corners or home bar cover (the page runs under them:
+     viewport-fit=cover in index.html). Zero on desktops. */
+  --ui-l: calc(var(--ui-x) + env(safe-area-inset-left, 0px));
+  --ui-r: calc(var(--ui-x) + env(safe-area-inset-right, 0px));
+  --ui-t: calc(var(--ui-y) + env(safe-area-inset-top, 0px));
+  --ui-b: calc(var(--ui-y) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 1599.98px), (max-height: 799.98px) {
+  :root {
+    --ui-x: 50px;
+    --ui-y: 45px;
+    --ui-size: 13.6px;
+    --ui-size-s: 12.24px;
+    --logo-w: 160px;
+    --page-size: 13.8px;
+  }
+}
+
+@media (max-width: 639.98px), (max-height: 639.98px) {
+  :root {
+    --ui-x: 25px;
+    --ui-y: 25px;
+    --ui-size: 11.9px;
+    --ui-size-s: 12.24px;
+    --logo-w: 140px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: linear-gradient(to bottom, var(--scan-bg-top), var(--scan-bg) 60%);
+  background-attachment: fixed;
+  color: var(--ui);
+  font-family: var(--mono);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Touch screens: the page only ever scrolls up and down. No pull-to-refresh
+   or rubber band at the ends (the loop jumps from the top to the end), no
+   pinch or double-tap zoom (it would leave the fixed UI adrift over the
+   scene), no grey tap flash, no iOS text inflation in landscape, and no
+   long-press text selection or callout over the scene. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body.is-intro {
+  overflow: hidden; /* scroll unlocks when the intro ends */
+}
+
+/* A relic's page is open (StormTransition.lock): the page stays put. */
+html.is-locked,
+html.is-locked body {
+  overflow: hidden;
+}
+
+/* No visible scrollbar (wheel / touch / keys still scroll), so nothing pops
+   in or shifts the layout when the intro unlocks scrolling. */
+html,
+body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* The large viewport's height (the screen with the browser's toolbar hidden):
+   on phones the toolbar slides in and out as the page scrolls, and a canvas
+   that followed it would resize (and redraw its buffers) each time. While the
+   toolbar shows, the canvas's bottom simply runs under it. */
+.stage,
+.stage-fallback {
+  position: fixed;
+  inset: 0 0 auto;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  touch-action: pan-y;
+}
+
+.stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.stage-fallback {
+  object-fit: cover;
+}
+
+.veil {
+  position: fixed;
+  inset: 0;
+  background: var(--scan-bg);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* The hero's UI stays put over the canvas while the page scrolls on through
+   the transition track; the scene follows the scroll (StormTransition). */
+.hero {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.track {
+  position: relative;
+  height: 270vh; /* replaced in px by StormTransition.layout: (loop + 1) screens + the viewport height */
+  pointer-events: none;
+}
+
+/* The no-WebGL fallback page (main.js runFallback adds the class): nothing
+   follows the hero, so no scrolling into an empty track. */
+body.is-fallback .track {
+  height: 0 !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.noscript {
+  position: fixed;
+  inset: auto 0 40% 0;
+  text-align: center;
+}

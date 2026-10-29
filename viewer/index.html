@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OCTOLITH asset viewer</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #e9cfae; overflow: hidden; }
+      canvas { display: block; }
+      #ui {
+        position: fixed; top: 16px; left: 16px; padding: 12px 14px;
+        font: 12px/1.6 ui-monospace, 'IBM Plex Mono', monospace; color: #fff;
+        background: rgba(40, 28, 18, 0.55); border-radius: 6px; backdrop-filter: blur(6px);
+      }
+      #ui label { display: block; }
+      #ui input[type='range'] { width: 160px; vertical-align: middle; }
+      body.shot #ui { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="ui">
+      <strong>// OCTOLITH · Scene 1 assets</strong>
+      <label>explode <input id="explode" type="range" min="0" max="1" step="0.01" value="0" /></label>
+      <label><input id="hover" type="checkbox" checked /> hover push</label>
+      <label><input id="cage" type="checkbox" /> wireframe cage</label>
+      <label><input id="outline" type="checkbox" /> block outlines</label>
+      <label><input id="points" type="checkbox" /> intro points</label>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

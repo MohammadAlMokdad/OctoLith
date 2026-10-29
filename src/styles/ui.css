@@ -1,0 +1,807 @@
+/* Corner UI: igloo's layout, font and sizes (IBM Plex Mono Medium; the
+   --ui-* variables in base.css). Monospace + one slot per character, so the
+   type-in (src/ui/scrambleText.js) never shifts the layout. */
+.corner {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.corner--tl {
+  top: var(--ui-t);
+  left: var(--ui-l);
+}
+
+/* right-aligned, 18 characters wide (igloo: 0.75 x scale 250) */
+.corner--tr {
+  top: calc(var(--ui-t) + var(--ui-size) * 0.29);
+  right: var(--ui-r);
+  width: calc(var(--ui-size) * 11.03);
+  text-align: right;
+}
+
+.corner--bl {
+  bottom: calc(var(--ui-b) + var(--ui-size-s) * 0.32);
+  left: var(--ui-l);
+}
+
+.ui-text {
+  margin: 0;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: var(--ui-size);
+  line-height: 1.25;
+  color: var(--ui);
+  text-shadow: var(--text-glow);
+}
+
+/* igloo's dark title lines ("// Copyright", "////// Manifesto"): no glow */
+.ui-title {
+  display: block;
+  color: var(--ui-title);
+  text-shadow: none;
+}
+
+/* igloo's --blink (src/ui/glitch.js) must not pass on to children. */
+@property --blink {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
+/* Hidden until phase G reveals each block. */
+[data-ui] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+[data-ui].is-shown {
+  opacity: calc(var(--ui-fade, 1) * var(--blink, 1));
+  visibility: visible;
+}
+
+/* Scrolling into section 2: the copyright, the manifesto and the scroll hint
+   fade out (--hero-ui goes 1 -> 0 on .hero, set by StormTransition) and stop
+   taking clicks; the logo and the sound toggle stay, like igloo's. */
+.manifesto,
+.corner--tl .ui-text,
+.scroll-hint {
+  --ui-fade: var(--hero-ui, 1);
+}
+
+.scroll-hint {
+  opacity: var(--ui-fade);
+}
+
+.hero.is-away [data-ui]:not(.logo, .corner--bl),
+.hero.is-away .scroll-hint {
+  visibility: hidden;
+}
+
+/* top left: the logo, then the copyright. The logo's box is igloo's height
+   (42 px on large screens) so everything under it keeps igloo's place; the
+   OCTOLITH wordmark (Papyrus, as outlines: brand/octolith-wordmark.svg) is
+   --wordmark-w wide, centred in it: its letters are as tall as the old
+   11-letter OCTOPYRAMID's were at 1.45x the logo width. */
+.logo {
+  --wordmark-w: calc(var(--logo-w) * 1.056);
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: var(--wordmark-w);
+  height: calc(var(--logo-w) * 0.21);
+  text-decoration: none;
+  filter: var(--logo-glow);
+}
+
+.logo__word {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.copyright {
+  margin-top: calc(var(--ui-size) * 0.99);
+}
+
+.copyright .ui-title {
+  margin-bottom: calc(var(--ui-size) * 0.95);
+}
+
+/* the logo's hover blinks these (igloo's uBlink) */
+.copyright > span {
+  display: block;
+  opacity: var(--blink, 1);
+}
+
+/* top right: the manifesto */
+.manifesto .ui-text {
+  line-height: 1.06;
+}
+
+.manifesto__title {
+  margin-bottom: calc(var(--ui-size) * 1.2);
+}
+
+.manifesto__text {
+  display: block;
+}
+
+/* bottom left: the scroll hint and the sound toggle (igloo: scale 230) */
+.scroll-hint {
+  max-width: calc(var(--ui-size-s) * 9);
+  font-size: var(--ui-size-s);
+  line-height: 1.11;
+  margin-bottom: calc(var(--ui-size-s) * 1.43);
+}
+
+.sound {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ui-size-s) * 0.56);
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: var(--ui-size-s);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sound__icon {
+  width: calc(var(--ui-size-s) * 1.4);
+  height: calc(var(--ui-size-s) * 1.4);
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: square;
+  filter: drop-shadow(0 0 4px rgba(255, 232, 196, 0.5));
+}
+
+.sound__icon {
+  opacity: var(--blink, 1);
+}
+
+.sound__speaker {
+  fill: currentColor;
+  stroke: none;
+}
+
+.sound[aria-pressed='true'] .sound__off,
+.sound[aria-pressed='false'] .sound__on {
+  display: none;
+}
+
+/* The toggle with the volume tip beside it (src/ui/SoundMixer.js). The state
+   keeps three characters' room, so the tip doesn't shift when Off turns On. */
+.sound-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ui-size-s) * 1.6);
+}
+
+#sound-state {
+  min-width: 3ch;
+}
+
+/* types in a beat after the toggle, fades out a few seconds later (and with
+   the hero's corners when the page scrolls away) */
+.sound-hint {
+  --ui-fade: var(--hero-ui, 1);
+  font-size: var(--ui-size-s);
+  line-height: 1.11;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.sound-hint.is-on {
+  opacity: var(--ui-fade);
+  transition-duration: 0.25s;
+}
+
+.sound-hint__mark {
+  color: var(--ui-title);
+  text-shadow: none;
+}
+
+/* The volumes: a box over the toggle, the Close box's bracket corners on a
+   dark glass so the sliders read over the sand and the dark sections alike.
+   Its text lines up with the toggle's; the scroll hint under it steps aside. */
+.sound-mixer {
+  --pad-x: 1.25em;
+  position: absolute;
+  left: calc(var(--pad-x) * -1);
+  bottom: calc(100% + 0.9em);
+  padding: 1em var(--pad-x) 1.05em;
+  font-size: var(--ui-size-s);
+  color: var(--ui);
+  background: rgba(18, 11, 7, 0.42);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  cursor: default;
+  touch-action: none; /* a drag on a slider never pans the page */
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+}
+
+.sound-mixer[hidden] {
+  display: none;
+}
+
+.sound-mixer.is-open {
+  opacity: 1;
+}
+
+/* (positioned, so it lies over the rows: the pointer goes through) */
+.sound-mixer__frame {
+  pointer-events: none;
+}
+
+.corner--bl.is-mixing .scroll-hint {
+  visibility: hidden;
+}
+
+/* over everything else on screen while it is open (the room's link box sits
+   near it on phones) */
+body:has(.sound-mixer.is-open) .hero {
+  z-index: 9;
+}
+
+.sound-mixer__title {
+  margin-bottom: 0.75em;
+  font-size: inherit;
+  color: var(--ui-light);
+  text-shadow: none;
+  opacity: 0.55;
+}
+
+.sound-mixer__row {
+  display: grid;
+  grid-template-columns: 5ch calc(var(--ui-size-s) * 8.5) 3ch;
+  align-items: center;
+  column-gap: 1.5ch;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+.sound-mixer__row + .sound-mixer__row {
+  margin-top: 0.35em;
+}
+
+.sound-mixer__value {
+  text-align: right;
+}
+
+/* a hairline track, lit up to the level, and a caret for the thumb */
+.sound-mixer__slider {
+  --v: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 1.6em;
+  margin: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sound-mixer__slider::-webkit-slider-runnable-track {
+  height: 1px;
+  background: linear-gradient(90deg, currentColor var(--v), rgba(255, 248, 238, 0.25) var(--v));
+  box-shadow: 0 0 4px rgba(255, 232, 196, 0.35);
+}
+
+.sound-mixer__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 3px;
+  height: 0.95em;
+  margin-top: calc(0.5px - 0.475em);
+  border: 0;
+  border-radius: 0;
+  background: currentColor;
+  box-shadow: 0 0 5px rgba(255, 232, 196, 0.7);
+}
+
+.sound-mixer__slider::-moz-range-track {
+  height: 1px;
+  background: rgba(255, 248, 238, 0.25);
+}
+
+.sound-mixer__slider::-moz-range-progress {
+  height: 1px;
+  background: currentColor;
+}
+
+.sound-mixer__slider::-moz-range-thumb {
+  width: 3px;
+  height: 0.95em;
+  border: 0;
+  border-radius: 0;
+  background: currentColor;
+  box-shadow: 0 0 5px rgba(255, 232, 196, 0.7);
+}
+
+.sound-mixer__slider:focus {
+  outline: none;
+}
+
+.sound-mixer__slider:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: 3px;
+}
+
+/* a finger's worth to grab */
+@media (pointer: coarse) {
+  .sound-mixer__slider {
+    height: 2.6em;
+  }
+
+  .sound-mixer__slider::-webkit-slider-thumb {
+    width: 4px;
+    height: 1.3em;
+    margin-top: calc(0.5px - 0.65em);
+  }
+
+  .sound-mixer__slider::-moz-range-thumb {
+    width: 4px;
+    height: 1.3em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-hint,
+  .sound-mixer {
+    transition: none;
+  }
+}
+
+/* Small controls take a finger-sized touch (~44 px) around what they show. */
+.sound::before,
+.relic__date::before,
+.relic-page__close::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
+/* The type-in writes into an aria-hidden layer; the final text stays readable. */
+.scramble__live {
+  white-space: pre-wrap;
+}
+
+.scramble__word {
+  white-space: nowrap;
+}
+
+/* igloo's block glitch (src/ui/glitch.js): clipped, shifted copies of the
+   element over it while its own content is hidden. The element itself stays
+   (still under the pointer: hiding it would end the hover and start it
+   again); a picture drawn by the element's own background (`self`) is
+   hidden with it. */
+.is-glitching > :not(.glitch),
+.is-glitching-self {
+  visibility: hidden !important;
+}
+
+.glitch {
+  position: absolute;
+  inset: 0;
+  visibility: visible;
+  pointer-events: none;
+}
+
+.glitch__cell {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+  transition: none !important;
+  visibility: visible !important;
+}
+
+/* Phones held upright: the manifesto moves down, right-aligned across the
+   width above the scroll hint (the pyramid fills the middle of the screen). */
+@media (max-width: 640px) {
+  .corner--tr {
+    width: calc(100vw - var(--ui-l) - var(--ui-r));
+    top: auto;
+    bottom: calc(var(--ui-b) + 110px);
+    right: var(--ui-r);
+  }
+
+  /* the volumes box opens over it there */
+  body:has(.sound-mixer.is-open) .manifesto {
+    visibility: hidden;
+  }
+}
+
+/* ?clean: hide the DOM UI (renders the static fallback image). */
+body.is-clean .hero,
+body.is-clean .hero *,
+body.is-clean .lil-gui {
+  visibility: hidden !important;
+}
+
+/* Section 2: labels around the centred crystal (src/vault/VaultHud.js). */
+/* (the canvas's size, so the labels land on its crystal: see .stage) */
+.vault-hud {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  z-index: 5;
+  pointer-events: none;
+  --ui: var(--ui-light);
+}
+
+/* igloo's labels are in 3D: they scale with the screen height, or on a
+   portrait phone with its width (the crystal fits the width there:
+   cfg.vault.camera.minAspect 0.8 -> 2.1 vh of a 0.8 screen = 2.6 vw). */
+.vault-hud .ui-text {
+  font-size: clamp(11px, min(2.1vh, 2.8vw), 24px);
+  line-height: 1.06;
+}
+
+.vault-hud__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.vault-hud__lines line {
+  stroke: var(--ui-light);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.relic {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.relic.is-focused {
+  visibility: visible;
+}
+
+.relic > p,
+.relic > h2 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.relic__title {
+  font-weight: 500;
+}
+
+.relic__temp {
+  text-align: right;
+}
+
+.relic__date {
+  position: relative;
+  padding: 0 0 0.35em;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Click to explore: the relic's page (src/vault/VaultDetail.js). */
+.relic-page {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  --ui: var(--page-text);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.relic-page.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The logo and the sound toggle stay live over an open page, like igloo's:
+   the hero's layer goes above it (neither has a background), and only those
+   two take the pointer, so the hero's hidden corners never cover the page's
+   text or its Close. */
+body:has(.relic-page.is-open) .hero {
+  z-index: 9;
+}
+
+body:has(.relic-page.is-open) .hero .corner {
+  pointer-events: none;
+}
+
+body:has(.relic-page.is-open) .hero :is(.logo, .sound, .sound-mixer) {
+  pointer-events: auto;
+}
+
+/* igloo's project page: a 500 px column (min(screen - 40, 500)) in the
+   middle of the screen, its text at --page-size (base.css) with 25 px
+   between blocks. It sits centred vertically when it fits; otherwise it
+   scrolls from 130 px down. Text fades out 65 -> 195 px from the top and
+   bottom edges, as igloo's does. On short screens (a phone on its side)
+   those shrink with the height, or the fades would meet and hide it all. */
+.relic-page__panel {
+  --fade-a: min(65px, 8vh);
+  --fade-b: min(195px, 22vh);
+  --pad: min(130px, 18vh);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: min(500px, 100vw - 40px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  transform: translateX(-50%);
+  overflow-y: auto;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: text;
+  user-select: text;
+  --fade: linear-gradient(
+    transparent var(--fade-a),
+    #000 var(--fade-b),
+    #000 calc(100% - var(--fade-b)),
+    transparent calc(100% - var(--fade-a))
+  );
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
+}
+
+.relic-page__panel::-webkit-scrollbar {
+  display: none;
+}
+
+.relic-page__item {
+  display: none;
+}
+
+.relic-page__item.is-current {
+  display: block;
+  margin: auto 0; /* centred when it fits, from the top when it scrolls */
+  padding: var(--pad) 0 calc(var(--pad) + env(safe-area-inset-bottom, 0px));
+}
+
+.relic-page__item .ui-text {
+  font-size: var(--page-size);
+  line-height: 1.3;
+  text-shadow: none; /* igloo's dim project text doesn't bloom */
+}
+
+.relic-page__item p {
+  margin: 0 0 1.3em;
+}
+
+.relic-page__head {
+  margin: 0 0 25px;
+  color: var(--page-title);
+  text-shadow: none;
+}
+
+/* 25 px after a block (collapses with the paragraph's blank line above) */
+h3.relic-page__head {
+  margin-top: 25px;
+}
+
+.relic-page__links a {
+  margin-right: 1.6em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.relic-page__links a:hover,
+.relic-page__links a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Close, in bracketed corners like igloo's box (120 x 54 on large screens),
+   at the top right of igloo's grid. The frame glitches on hover. */
+.relic-page__close {
+  position: absolute;
+  z-index: 1; /* over the text panel, which spans the whole width of a phone */
+  top: calc(var(--ui-t) - var(--logo-w) * 0.0324);
+  right: var(--ui-r);
+  width: calc(var(--logo-w) * 0.6);
+  height: calc(var(--logo-w) * 0.27);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-light);
+  cursor: pointer;
+}
+
+.relic-page__frame,
+.sound-mixer__frame {
+  position: absolute;
+  inset: 0;
+  opacity: var(--blink, 1);
+  filter: drop-shadow(0 0 4px rgba(255, 232, 196, 0.45));
+  background:
+    linear-gradient(currentColor, currentColor) top left / 7px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) top left / 1px 7px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 7px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 1px 7px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 7px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 1px 7px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 7px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 1px 7px no-repeat;
+}
+
+.relic-page__close [data-scramble] {
+  position: relative;
+}
+
+.relic-page__close:focus-visible,
+.relic__date:focus-visible,
+.relic-page__links a:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: 4px;
+}
+
+
+
+/* Section 4: the room's links (src/room/RoomLinks.js), igloo's footer UI. The
+   current link's title sits in a bracket box (220 x 70.4 px at 1600 x 800 and
+   up, 180 x 57.6 below, 150 x 48 on phones) centred topMargin + 20 px above
+   the bottom (+ 80 on phones); its neighbours sit 250 / 175 / 150 px to
+   either side, faded out from 100 / 70 / 50 px off the centre over a further
+   200 / 140 / 110 px. Only the box takes clicks: a click elsewhere goes to
+   the page, where either half of the screen changes the link. */
+.room-links {
+  --box-w: 220px;
+  --box-h: 70.4px;
+  --gap: 250px;
+  --fade: 100px;
+  --fade-m: 200px;
+  --title: 19.25px;
+  --arm: 12px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--ui-b) + 20px - var(--box-h) / 2);
+  height: var(--box-h);
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s ease-out,
+    visibility 0s linear 0.15s;
+}
+
+.room-links.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.15s ease-out;
+}
+
+@media (max-width: 1599.98px), (max-height: 799.98px) {
+  .room-links {
+    --box-w: 180px;
+    --box-h: 57.6px;
+    --gap: 175px;
+    --fade: 70px;
+    --fade-m: 140px;
+    --title: 15.4px;
+    --arm: 10px;
+  }
+}
+
+@media (max-width: 639.98px), (max-height: 639.98px) {
+  .room-links {
+    bottom: calc(var(--ui-b) + 80px - var(--box-h) / 2);
+    --box-w: 150px;
+    --box-h: 48px;
+    --gap: 150px;
+    --fade: 50px;
+    --fade-m: 110px;
+    --title: 14.4px;
+    --arm: 8px;
+  }
+}
+
+.room-links__frame {
+  position: absolute;
+  top: 0;
+  left: calc(50% - var(--box-w) / 2);
+  width: var(--box-w);
+  height: 100%;
+  color: var(--ui);
+  opacity: var(--blink, 1);
+  filter: drop-shadow(0 0 4px rgba(255, 232, 196, 0.45));
+  background:
+    linear-gradient(currentColor, currentColor) top left / var(--arm) 2px no-repeat,
+    linear-gradient(currentColor, currentColor) top left / 2px var(--arm) no-repeat,
+    linear-gradient(currentColor, currentColor) top right / var(--arm) 2px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 2px var(--arm) no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / var(--arm) 2px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 2px var(--arm) no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / var(--arm) 2px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 2px var(--arm) no-repeat;
+}
+
+.room-links__list {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  --edge: linear-gradient(
+    90deg,
+    transparent calc(50% - var(--fade) - var(--fade-m)),
+    #000 calc(50% - var(--fade)),
+    #000 calc(50% + var(--fade)),
+    transparent calc(50% + var(--fade) + var(--fade-m))
+  );
+  -webkit-mask-image: var(--edge);
+  mask-image: var(--edge);
+}
+
+.room-links__link {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: var(--title);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transform: translate(calc(-50% + var(--pos, 0) * var(--gap)), -50%);
+}
+
+.room-links__link[data-pos='-1'] {
+  --pos: -1;
+}
+
+.room-links__link[data-pos='1'] {
+  --pos: 1;
+}
+
+.room-links__link:not([data-pos]) {
+  visibility: hidden;
+}
+
+/* the current one: the whole box opens it */
+.room-links.is-on .room-links__link[data-pos='0'] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--box-w);
+  height: var(--box-h);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.room-links__link:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: -6px;
+}
+
+/* over the room's arrows */
+html.is-pointer {
+  cursor: pointer;
+}

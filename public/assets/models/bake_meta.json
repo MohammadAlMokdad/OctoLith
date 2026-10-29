@@ -1,0 +1,12 @@
+{
+  "explode": {
+    "base": 0.3,
+    "rand": 0.2,
+    "capLift": 0.5
+  },
+  "colorManagement": {
+    "view": "AgX",
+    "look": "AgX - Medium High Contrast",
+    "exposure": -0.75
+  }
+}
